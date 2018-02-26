@@ -64,14 +64,15 @@ class SearchPage extends React.Component {
         return (
             <View style={styles.searchBox}>
                 <Image source={require('./img/head/search.png')} style={styles.searchIcon} />
-                <TextInput onChangeText={text=>this.inputKey=text}
+                <TextInput
                            ref="input"
                            autoFocus={true}
                            style={styles.searchContent}
                            underlineColorAndroid="white"
                            clearTextOnFocus={true}
                            clearButtonMode="while-editing"
-                           placeholder='请输入车牌号' >
+                           placeholder='请输入车牌号'
+                           onChangeText={text=>this.inputKey=text}>
                 </TextInput>
             </View>
         )
@@ -80,6 +81,7 @@ class SearchPage extends React.Component {
     renderRightItem() {
         return (
             <TouchableOpacity onPress={()=>{
+                console.log(this);
                 this.refs.input.blur();//隐藏键盘,失去焦点
                 this.onRightButtonClick();
             }} style={styles.navRight}>
@@ -98,7 +100,7 @@ class SearchPage extends React.Component {
     onRightButtonClick(){
         if (this.state.rightButtonText ==='搜索'){
             this.updateState({rightButtonText:'取消'})
-            this.loadData();
+            // this.loadData();
 
         } else if (this.state.rightButtonText ==='取消'){
             this.updateState({
@@ -106,7 +108,7 @@ class SearchPage extends React.Component {
                 isLoading:false
             })
 
-            this.cancelRequest.cancel();
+            // this.cancelRequest.cancel();
         } else {
 
         }
@@ -115,13 +117,26 @@ class SearchPage extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <CommonHead
-                    leftItem={() => this.renderLeftItem()}
-                    titleItem={() => this.renderTitleItem()}
-                    rightItem={() => this.renderRightItem()}
-                    navBarColor={F8Colors.blue}
-                />
+                <View style={[{width:width,
+                    zIndex:99,
+                    height:45 + STATUS_BAR_HEIGHT,
+                    paddingTop: STATUS_BAR_HEIGHT,
+                    backgroundColor: F8Colors.blue,
+                    flexDirection:'row',
+                    justifyContent:'space-between',
+                    alignItems: 'center'}
+                ]}>
+                    <View>
+                        {this.renderLeftItem()}
+                    </View>
+                    <View>
+                        {this.renderTitleItem()}
+                    </View>
+                    <View>
+                        {this.renderRightItem()}
+                    </View>
                 <View></View>
+                </View>
             </View>
         );
     }
