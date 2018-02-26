@@ -11,6 +11,7 @@
  */
 import React, { Component } from 'react';
 import { connect } from "react-redux";
+import LoginScreen from "../login/LoginScreen";
 
 
 class NetUitl extends React.Component{
@@ -43,9 +44,13 @@ class NetUitl extends React.Component{
                 'Authorization': 'Bearer '+ this.props.token
             },
         })
-            .then((response) => {
-                callback(response)
-            }).done();
+        .then((response) => {
+            if (response.status === 401) {
+                console.log("401");
+                return <LoginScreen />
+            }
+            callback(response)
+        }).done();
     }
     /*
      *  post请求
@@ -62,10 +67,10 @@ class NetUitl extends React.Component{
             },
             body:JSON.stringify(params)
         })
-            .then((response) => response.json())
-            .then((responseJSON) => {
-                callback(responseJSON)
-            }) .done();
+        .then((response) => response.json())
+        .then((responseJSON) => {
+            callback(responseJSON)
+        }) .done();
     }
 
 

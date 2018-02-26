@@ -66,7 +66,11 @@ class SearchPage extends React.Component {
                 <Image source={require('./img/head/search.png')} style={styles.searchIcon} />
                 <TextInput onChangeText={text=>this.inputKey=text}
                            ref="input"
+                           autoFocus={true}
                            style={styles.searchContent}
+                           underlineColorAndroid="white"
+                           clearTextOnFocus={true}
+                           clearButtonMode="while-editing"
                            placeholder='请输入车牌号' >
                 </TextInput>
             </View>
@@ -88,6 +92,7 @@ class SearchPage extends React.Component {
         console.log(this.refs);
         this.refs.input.blur();//隐藏键盘,失去焦点
         this.props.navigator.pop();
+        return true;
     }
 
     onRightButtonClick(){
