@@ -103,18 +103,13 @@ function skipLogin(): Action {
   };
 }
 
-// function logOut(): ThunkAction {
-//   return dispatch => {
-//     Parse.User.logOut();
-//     FacebookSDK.logout();
-//     updateInstallation({ user: null, channels: [] });
-//
-//     // TODO: Make sure reducers clear their state
-//     return dispatch({
-//       type: "LOGGED_OUT"
-//     });
-//   };
-// }
+function logOut(): ThunkAction {
+  return dispatch => {
+    return dispatch({
+      type: "LOGGED_OUT"
+    });
+  };
+}
 //
 // function logOutWithPrompt(): ThunkAction {
 //   return (dispatch, getState) => {
@@ -143,4 +138,4 @@ function skipLogin(): Action {
 //   };
 // }
 
-module.exports = {userLogIn, skipLogin};
+module.exports = {userLogIn, skipLogin, logOut};

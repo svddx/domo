@@ -11,8 +11,8 @@
  */
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import LoginScreen from "../login/LoginScreen";
-
+import { logOut } from "../actions"
+import { Alert } from 'react-native'
 
 class NetUitl extends React.Component{
 
