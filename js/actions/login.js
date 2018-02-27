@@ -31,6 +31,7 @@
 // import { loadSurveys } from "./surveys";
 
 import type { Action, ThunkAction } from "./types";
+import type {api} from "../urls"
 
 // async function ParseFacebookLogin(scope): Promise {
 //   return new Promise((resolve, reject) => {
@@ -58,7 +59,7 @@ async function _userLogIn(req: ?Object): Promise<Array<Action>> {
 
     console.log("gogogo");
 
-    let response = await fetch('http://map.zxsmart.cn:8080/auth/v1.0/login', {
+    let response = await fetch(api.auth_url, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',

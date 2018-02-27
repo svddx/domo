@@ -1,13 +1,7 @@
 
 /**
  * NetUitl 网络请求的实现
- * https://github.com/facebook/react-native
- *
- *    get请求,以百度为例,没有参数,没有header
- *    NetUitl.get('https://www.baidu.com/','',function (set) {
- *       //下面是请求下来的数据
- *       console.log(set)
- *   })
+ * 返回promise对象
  */
 import React, { Component } from 'react';
 import { connect } from "react-redux";
@@ -24,9 +18,9 @@ class NetUitl extends React.Component{
      *  get请求
      *  url:请求地址
      *  data:参数
-     *  callback:回调函数
+     *  返回promise对象
      * */
-    static get(url,params,headers,callback){
+    static get(url,params,headers){
         if (params) {
             let paramsArray = [];
             //拼接参数
@@ -47,11 +41,22 @@ class NetUitl extends React.Component{
         .then((response) => {
             if (response.status === 401) {
                 console.log("401");
-                return <LoginScreen />
+                return logOut();
             }
-            callback(response)
+            if(response.status>=200 && response.status<300){
+                console.log('Content-Type: ' + response.headers.get('Content-Type'));
+                console.log('Date: ' + response.headers.get('Date'));
+                console.log('status: ' + response.status);
+                console.log('statusText: ' + response.statusText);
+                console.log('type: ' + response.type);
+                console.log('url: ' + response.url);
+                return Promise.resolve(response);
+            } else {
+                return Promise.reject(new Error(response.statusText));
+            }
         }).done();
     }
+
     /*
      *  post请求
      *  url:请求地址
@@ -67,13 +72,24 @@ class NetUitl extends React.Component{
             },
             body:JSON.stringify(params)
         })
-        .then((response) => response.json())
-        .then((responseJSON) => {
-            callback(responseJSON)
-        }) .done();
+        .then((response) => {
+                if (response.status === 401) {
+                    console.log("401");
+                    return logOut();
+                }
+                if(response.status>=200 && response.status<300){
+                    console.log('Content-Type: ' + response.headers.get('Content-Type'));
+                    console.log('Date: ' + response.headers.get('Date'));
+                    console.log('status: ' + response.status);
+                    console.log('statusText: ' + response.statusText);
+                    console.log('type: ' + response.type);
+                    console.log('url: ' + response.url);
+                    return Promise.resolve(response);
+                } else {
+                    return Promise.reject(new Error(response.statusText));
+                }
+        }).done();
     }
-
-
 }
 
 const mapStateToProps = (state) => {

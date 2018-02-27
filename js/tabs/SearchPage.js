@@ -9,13 +9,20 @@ import {
     Image,
     TextInput,
     TouchableOpacity,
+    ActivityIndicator,
     ScrollView,
     Dimensions,
 } from 'react-native';
 
 // 引用头部组件
 import CommonHead from '../common/commonHead';
+import Toast, {DURATION} from 'react-native-easy-toast'
 import F8Colors from "../common/F8Colors";
+import { api } from "../urls";
+import makeCancelable from "../util/Cancelable"
+import NetUtil from "../common/NetUitl"
+import FavoriteDao from '../expand/dao/FavoriteDao'
+import MyList from  "../common/MyList"
 
 // 取得屏幕的宽高Dimensions
 const { width, height } = Dimensions.get('window');
@@ -34,9 +41,10 @@ class SearchPage extends React.Component {
 
     constructor(props){
         super(props);
-        this.keys = [],
-        this.isKeyChanged = false,
+        this.favoriteDao = new FavoriteDao('search');
+        this.favoritKeys = [];
         this.state={
+            inputKey:'',
             theme:this.props.theme,
             favoriteKeys:[],
             isLoading:false,
@@ -44,7 +52,6 @@ class SearchPage extends React.Component {
             showBottomButton:false,
         }
     }
-
 
     updateState(dict){
         if(!this)return;
@@ -72,7 +79,7 @@ class SearchPage extends React.Component {
                            clearTextOnFocus={true}
                            clearButtonMode="while-editing"
                            placeholder='请输入车牌号'
-                           onChangeText={text=>this.inputKey=text}>
+                           onChangeText={(inputKey) => this.setState({inputKey})}>
                 </TextInput>
             </View>
         )
@@ -97,6 +104,88 @@ class SearchPage extends React.Component {
         return true;
     }
 
+    genFetchUrl(){
+        return api.vehicle_page + "?currentPage=" + 1
+        + "&pageSize=" + 20
+        + "&status=" + 'all'
+        + "&searchInput=" + this.state.inputKey;
+    }
+
+    getFavoriteKeys() {//获取本地用户收藏的ProjectItem
+        this.favoriteDao.getFavoriteKeys().then((keys)=> {
+            this.favoritKeys = keys || [];
+            this.flushFavoriteState();
+        }).catch((error)=> {
+            this.flushFavoriteState();
+            console.log(error);
+        });
+    }
+
+    flushFavoriteState() {//更新ProjectItem的Favorite状态
+        let projectModels = [];
+        let items = this.items;
+        for (var i = 0, len = items.length; i < len; i++) {
+            projectModels.push(new ProjectModel(items[i], Utils.checkFavorite(items[i], this.favoritKeys)));
+        }
+        this.updateState({
+            isLoading: false,
+            dataSource: this.getDataSource(projectModels),
+            rightButtonText: 'Go',
+        });
+    }
+
+    checkKeyIsExist(keys, key) {
+        for (let i = 0, l = keys.length; i < l; i++) {
+            if (key.toLowerCase() === keys[i].name.toLowerCase())return true;
+        }
+        return false;
+    }
+
+    saveKey() {
+        let key = this.state.inputKey;
+        if (this.checkKeyIsExist(this.keys, key)) {
+            this.refs.toast.show(this.state.inputKey + ' already exists.', DURATION.LENGTH_SHORT)
+        } else {
+            key = {
+                "path": key,
+                "name": key,
+                "checked": true
+            };
+            this.keys.unshift(key);
+            this.languageDao.save(this.keys)
+            this.refs.toast.show(this.state.inputKey + ' saved successfully.', DURATION.LENGTH_SHORT);
+            this.isKeyChange = true;
+        }
+    }
+
+    loadData() {
+        this.updateState({
+            isLoading: true,
+            showBottomButton: false,
+        });
+        this.cancelable = makeCancelable(NetUtil.get(this.genFetchUrl()));
+        this.cancelable.promise
+            .then((response)=>response.json())
+            .then((responseData)=> {
+                if (!this || !responseData || !responseData.items || responseData.items.length === 0) {
+                    this.refs.toast.show(this.state.inputKey + ' nothing found.', DURATION.LENGTH_SHORT);
+                    this.updateState({isLoading: false, rightButtonText: '搜索',});
+                    return;
+                }
+                this.items = responseData;
+                this.getFavoriteKeys();
+                if (!this.checkKeyIsExist(this.keys, this.state.inputKey)) {
+                    this.updateState({showBottomButton: true,})
+                }
+            })
+            .catch((error)=> {
+                this.updateState({
+                    isLoading: false,
+                    rightButtonText: 'Go',
+                });
+            });
+    }
+
     onRightButtonClick(){
         if (this.state.rightButtonText ==='搜索'){
             this.updateState({rightButtonText:'取消'})
@@ -115,6 +204,36 @@ class SearchPage extends React.Component {
     }
 
     render() {
+        let bottomButton = this.state.showBottomButton ?
+            <TouchableOpacity
+                underlayColor="transparent"
+                style={[styles.bottomButton, {backgroundColor: this.props.theme.themeColor}]}
+                onPress={()=> {
+                    this.saveKey();
+                }}
+            >
+                <View style={{justifyContent: 'center',}}>
+                    <Text style={styles.title}>Add Key {this.state.inputKey} </Text>
+                </View>
+            </TouchableOpacity>
+            : null;
+        let indicatorView = this.state.isLoading ?
+            <ActivityIndicator
+                animating={this.state.isLoading}
+                style={[styles.centering,]}
+                size="large"
+            /> : null;
+        let listView = !this.state.isLoading ?
+            <MyList
+                ref="listView"
+                data={this.state.dataSource}
+                navigator = {this.props.navigator}
+            /> : null;
+        let resultView =
+            <View style={{flex: 1}}>
+                {indicatorView}
+                {listView}
+            </View>
         return (
             <View style={styles.container}>
                 <View style={[{width:width,
@@ -135,8 +254,12 @@ class SearchPage extends React.Component {
                     <View>
                         {this.renderRightItem()}
                     </View>
-                <View></View>
+                    <View>
+                        {resultView}
+                        {bottomButton}
+                    </View>
                 </View>
+                <Toast ref="toast" position='bottom'/>
             </View>
         );
     }
@@ -204,6 +327,12 @@ const styles = StyleSheet.create({
         opacity:0.7,
         color:'white'
     },
+    centering: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 8,
+        flex: 1,
+    }
 });
 
 module.exports = connect()(SearchPage)
