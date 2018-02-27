@@ -18,7 +18,7 @@ import {
 import CommonHead from '../common/commonHead';
 import Toast, {DURATION} from 'react-native-easy-toast'
 import F8Colors from "../common/F8Colors";
-import { api } from "../urls";
+import { NetApi } from "../urls";
 import makeCancelable from "../util/Cancelable"
 import NetUtil from "../common/NetUitl"
 import FavoriteDao from '../expand/dao/FavoriteDao'
@@ -105,7 +105,7 @@ class SearchPage extends React.Component {
     }
 
     genFetchUrl(){
-        return api.vehicle_page + "?currentPage=" + 1
+        return NetApi.vehicle_page + "?currentPage=" + 1
         + "&pageSize=" + 20
         + "&status=" + 'all'
         + "&searchInput=" + this.state.inputKey;
@@ -189,7 +189,7 @@ class SearchPage extends React.Component {
     onRightButtonClick(){
         if (this.state.rightButtonText ==='搜索'){
             this.updateState({rightButtonText:'取消'})
-            // this.loadData();
+            this.loadData();
 
         } else if (this.state.rightButtonText ==='取消'){
             this.updateState({
@@ -233,7 +233,7 @@ class SearchPage extends React.Component {
             <View style={{flex: 1}}>
                 {indicatorView}
                 {listView}
-            </View>
+            </View>;
         return (
             <View style={styles.container}>
                 <View style={[{width:width,
@@ -254,10 +254,11 @@ class SearchPage extends React.Component {
                     <View>
                         {this.renderRightItem()}
                     </View>
-                    <View>
-                        {resultView}
-                        {bottomButton}
-                    </View>
+
+                </View>
+                <View>
+                    {resultView}
+                    {bottomButton}
                 </View>
                 <Toast ref="toast" position='bottom'/>
             </View>

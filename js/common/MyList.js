@@ -1,5 +1,6 @@
 import React from 'react';
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
+import {Text} from "./F8Text";
 
 
 class MyListItem extends React.PureComponent {
@@ -10,10 +11,8 @@ class MyListItem extends React.PureComponent {
     render() {
         let Component = this.props.component;
         return (
-            <Component
-                {...this.props}
-                onPress={this._onPress}
-            />
+            <Text>HHHA</Text>
+
         )
     }
 }
@@ -56,7 +55,8 @@ export default  class MyList extends React.PureComponent {
 
     // 自定义分割线
     _renderItemSeparatorComponent = ({highlighted}) => (
-        <View style={{ height:1, backgroundColor:'#000' }}></View>
+        <View style={{ height:1, backgroundColor:'#000' }}>
+        </View>
     );
 
     // 空布局
@@ -77,6 +77,7 @@ export default  class MyList extends React.PureComponent {
     render() {
 
         return (
+            <View>
             <FlatList
                 data={this.props.data}
                 extraData={this.state}
@@ -89,6 +90,7 @@ export default  class MyList extends React.PureComponent {
                 // ListFooterComponent={ this._renderFooter }
 
             />
+            </View>
         );
     }
 }

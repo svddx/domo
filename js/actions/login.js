@@ -31,7 +31,7 @@
 // import { loadSurveys } from "./surveys";
 
 import type { Action, ThunkAction } from "./types";
-import type {api} from "../urls"
+import { NetApi }   from "../urls"
 
 // async function ParseFacebookLogin(scope): Promise {
 //   return new Promise((resolve, reject) => {
@@ -57,9 +57,9 @@ import type {api} from "../urls"
 async function _userLogIn(req: ?Object): Promise<Array<Action>> {
 
 
-    console.log("gogogo");
+    console.log(NetApi);
 
-    let response = await fetch(api.auth_url, {
+    let response = await fetch(NetApi.auth_url, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',

@@ -10,10 +10,6 @@ import { Alert } from 'react-native'
 
 class NetUitl extends React.Component{
 
-    props:{
-        token: ?string
-    };
-
     /*
      *  get请求
      *  url:请求地址
@@ -92,10 +88,11 @@ class NetUitl extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const select = (store) => {
+    console.log(store);
     return {
-        token: state.token
+        token: store.user.token
     }
 }
 
-module.exports = connect()(NetUitl);
+module.exports = connect(select)(NetUitl);

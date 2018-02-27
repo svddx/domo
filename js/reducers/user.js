@@ -43,7 +43,7 @@ const initialState = {
   sharedSchedule: null,
   userid: null,
   username: null,
-  token: null,
+  token: 'XXX',
   roles: null,
   isInitPwd: false
 };

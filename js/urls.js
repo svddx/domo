@@ -12,7 +12,7 @@ function common_url (path) {
 }
 
 module.exports = {
-    api: {
+    NetApi: {
         auth_url: common_url('/auth/v1.0/login'),
         register: api_url('/register/v1.0'),
         register_status: api_url('/register/v1.0/status'),
@@ -66,4 +66,4 @@ module.exports = {
         alarm_export:api_url('/alarms/v1.0/export'),
         frequent_locations: api_url('/map/track/frequent_locations')
     }
-}
+};
