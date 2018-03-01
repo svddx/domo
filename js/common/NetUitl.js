@@ -8,7 +8,10 @@ import { connect } from "react-redux";
 import { logOut } from "../actions"
 import { Alert } from 'react-native'
 
-class NetUitl extends React.Component{
+let store = GLOBAL.store;
+
+export default class NetUitl {
+
 
     /*
      *  get请求
@@ -16,7 +19,7 @@ class NetUitl extends React.Component{
      *  data:参数
      *  返回promise对象
      * */
-    static get(url,params,headers){
+    static get(url,params,token){
         if (params) {
             let paramsArray = [];
             //拼接参数
@@ -27,17 +30,18 @@ class NetUitl extends React.Component{
                 url += '&' + paramsArray.join('&')
             }
         }
+        console.log(GLOBAL.store.getState());
         //fetch请求
         fetch(url,{
             method: 'GET',
             headers:{
-                'Authorization': 'Bearer '+ this.props.token
+                'Authorization': 'Bearer '+ GLOBAL.store.getState().user.token
             },
         })
         .then((response) => {
             if (response.status === 401) {
                 console.log("401");
-                return logOut();
+                return GLOBAL.store.dispatch(logOut());
             }
             if(response.status>=200 && response.status<300){
                 console.log('Content-Type: ' + response.headers.get('Content-Type'));
@@ -46,6 +50,7 @@ class NetUitl extends React.Component{
                 console.log('statusText: ' + response.statusText);
                 console.log('type: ' + response.type);
                 console.log('url: ' + response.url);
+                console.log(response);
                 return Promise.resolve(response);
             } else {
                 return Promise.reject(new Error(response.statusText));
@@ -59,12 +64,12 @@ class NetUitl extends React.Component{
      *  data:参数
      *  callback:回调函数
      * */
-    static post(url,params,headers,callback){
+    static post(url,params,token){
         //fetch请求
         fetch(url,{
             method: 'POST',
             headers:{
-                'Authorization': 'Bearer '+ this.props.token
+                'Authorization': 'Bearer '+ GLOBAL.store.getState().user.token
             },
             body:JSON.stringify(params)
         })
@@ -87,12 +92,3 @@ class NetUitl extends React.Component{
         }).done();
     }
 }
-
-const select = (store) => {
-    console.log(store);
-    return {
-        token: store.user.token
-    }
-}
-
-module.exports = connect(select)(NetUitl);

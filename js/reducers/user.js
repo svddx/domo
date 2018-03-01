@@ -43,12 +43,13 @@ const initialState = {
   sharedSchedule: null,
   userid: null,
   username: null,
-  token: 'XXX',
+  token: '',
   roles: null,
   isInitPwd: false
 };
 
 function user(state: State = initialState, action: Action): State {
+  console.log(action.type);
   if (action.type === "LOGGED_IN") {
     console.log(action.data);
     let { userid, username, token, roles, isInitPwd} = action.data;
@@ -56,11 +57,11 @@ function user(state: State = initialState, action: Action): State {
     return {
       isLoggedIn: true,
       hasSkippedLogin: false,
-      token,
-      userid,
-      username,
-      roles,
-      isInitPwd
+      token:token,
+      userid:userid,
+      username:username,
+      roles:roles,
+      isInitPwd:isInitPwd
     };
   }
   if (action.type === "SKIPPED_LOGIN") {
@@ -70,6 +71,7 @@ function user(state: State = initialState, action: Action): State {
     };
   }
   if (action.type === "LOGGED_OUT") {
+    console.log("LOGGED_OUT");
     return initialState;
   }
   if (action.type === "SET_SHARING") {

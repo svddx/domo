@@ -10,6 +10,7 @@ import { persistStore, autoRehydrate } from "redux-persist";
 import { AsyncStorage } from "react-native";
 import { ensureCompatibility } from "./compatibility";
 
+
 const isDebuggingInChrome = false;
 const logger = createLogger({
     predicate: (getState, action) => isDebuggingInChrome,
@@ -36,6 +37,7 @@ async function configureStore(onComplete: ?()=>void) {
     persistStore(store, { storage: AsyncStorage }, () => onComplete(didReset));
 
 
+    GLOBAL.store = store;
     if (isDebuggingInChrome) {
         window.store = store;
     }

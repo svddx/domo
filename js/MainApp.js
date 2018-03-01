@@ -59,7 +59,6 @@ class App extends React.Component {
     };
 
     render() {
-        console.log(this);
         if (!this.props.skipWelcomeScreen) {
             return <LoginScreen />;
         }
@@ -87,7 +86,7 @@ const styles = StyleSheet.create({
 function select(store) {
     return {
         isLoggedIn: store.user.isLoggedIn,
-        skipWelcomeScreen: store.user.isLoggedIn || store.user.hasSkippedLogin
+        skipWelcomeScreen: store.user.isLoggedIn || store.user.hasSkippedLogin,
     };
 }
 

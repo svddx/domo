@@ -164,26 +164,29 @@ class SearchPage extends React.Component {
             showBottomButton: false,
         });
         this.cancelable = makeCancelable(NetUtil.get(this.genFetchUrl()));
-        this.cancelable.promise
-            .then((response)=>response.json())
-            .then((responseData)=> {
-                if (!this || !responseData || !responseData.items || responseData.items.length === 0) {
-                    this.refs.toast.show(this.state.inputKey + ' nothing found.', DURATION.LENGTH_SHORT);
-                    this.updateState({isLoading: false, rightButtonText: '搜索',});
-                    return;
-                }
-                this.items = responseData;
-                this.getFavoriteKeys();
-                if (!this.checkKeyIsExist(this.keys, this.state.inputKey)) {
-                    this.updateState({showBottomButton: true,})
-                }
-            })
-            .catch((error)=> {
-                this.updateState({
-                    isLoading: false,
-                    rightButtonText: 'Go',
-                });
-            });
+        this.cancelable.promise.then(response=>console.log(response));
+        // this.cancelable.promise
+        //     .then((response)=>{
+        // console.log(response)})
+        //     .then((responseData)=> {
+        //         console.log(responseData);
+        //         if (!this || !responseData || !responseData.items || responseData.items.length === 0) {
+        //             this.refs.toast.show(this.state.inputKey + ' nothing found.', DURATION.LENGTH_SHORT);
+        //             this.updateState({isLoading: false, rightButtonText: '搜索',});
+        //             return;
+        //         }
+        //         this.items = responseData;
+        //         this.getFavoriteKeys();
+        //         if (!this.checkKeyIsExist(this.keys, this.state.inputKey)) {
+        //             this.updateState({showBottomButton: true,})
+        //         }
+        //     })
+        //     .catch((error)=> {
+        //         this.updateState({
+        //             isLoading: false,
+        //             rightButtonText: 'Go',
+        //         });
+        //     });
     }
 
     onRightButtonClick(){

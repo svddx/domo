@@ -105,6 +105,7 @@ function skipLogin(): Action {
 }
 
 function logOut(): ThunkAction {
+    console.log("logOut");
   return dispatch => {
     return dispatch({
       type: "LOGGED_OUT"
