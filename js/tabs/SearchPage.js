@@ -164,6 +164,7 @@ class SearchPage extends React.Component {
             showBottomButton: false,
         });
         this.cancelable = makeCancelable(NetUtil.get(this.genFetchUrl()));
+        console.log(this.cancelable.promise);
         this.cancelable.promise.then(response=>console.log(response));
         // this.cancelable.promise
         //     .then((response)=>{

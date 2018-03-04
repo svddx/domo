@@ -10,7 +10,27 @@ import { Alert } from 'react-native'
 
 let store = GLOBAL.store;
 
+export default function makeCancelable(promise){
+    let hasCanceled_ = false;
+    const wrappedPromise = new Promise((resolve, reject) => {
+        promise.then((val) =>
+            hasCanceled_ ? reject({isCanceled: true}) : resolve(val)
+        );
+        promise.catch((error) =>
+            hasCanceled_ ? reject({isCanceled: true}) : reject(error)
+        );
+    });
+
+    return {
+        promise: wrappedPromise,
+        cancel() {
+            hasCanceled_ = true;
+        },
+    };
+}
+
 export default class NetUitl {
+    let hasCanceled_ = false;
 
 
     /*
@@ -19,7 +39,7 @@ export default class NetUitl {
      *  data:参数
      *  返回promise对象
      * */
-    static get(url,params,token){
+    static get(url,params,token) {
         if (params) {
             let paramsArray = [];
             //拼接参数
@@ -31,31 +51,46 @@ export default class NetUitl {
             }
         }
         console.log(GLOBAL.store.getState());
+
+
+        return new Promise(function (resolve, reject) {
+            fetch(url,{
+                method: 'GET',
+                headers:{
+                    'Authorization': 'Bearer '+ GLOBAL.store.getState().user.token
+                },
+            }).then((response) => {
+
+                if (this.hasCanceled_) {
+                    reject({isCanceled: true})
+
+                } else {
+                    if (response.status === 401) {
+                        console.log("401");
+                        return GLOBAL.store.dispatch(logOut());
+                    }
+                    if(response.status>=200 && response.status<300){
+                        console.log('Content-Type: ' + response.headers.get('Content-Type'));
+                        console.log('Date: ' + response.headers.get('Date'));
+                        console.log('status: ' + response.status);
+                        console.log('statusText: ' + response.statusText);
+                        console.log('type: ' + response.type);
+                        console.log('url: ' + response.url);
+                        console.log(response);
+
+                    } else {
+                        return Promise.reject(new Error(response.statusText));
+                    }
+                }).done();
+
+
+                }
+
+
+
+        });
         //fetch请求
-        fetch(url,{
-            method: 'GET',
-            headers:{
-                'Authorization': 'Bearer '+ GLOBAL.store.getState().user.token
-            },
-        })
-        .then((response) => {
-            if (response.status === 401) {
-                console.log("401");
-                return GLOBAL.store.dispatch(logOut());
-            }
-            if(response.status>=200 && response.status<300){
-                console.log('Content-Type: ' + response.headers.get('Content-Type'));
-                console.log('Date: ' + response.headers.get('Date'));
-                console.log('status: ' + response.status);
-                console.log('statusText: ' + response.statusText);
-                console.log('type: ' + response.type);
-                console.log('url: ' + response.url);
-                console.log(response);
-                return Promise.resolve(response);
-            } else {
-                return Promise.reject(new Error(response.statusText));
-            }
-        }).done();
+
     }
 
     /*
